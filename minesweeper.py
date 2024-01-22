@@ -230,10 +230,12 @@ class MinesweeperAI():
                     self.mark_safe(cell)
 
         for sentence in self.knowledge:
-            if new_sentence.cells.issubset(sentence.cells) and new_sentence.count > 0 and sentence.count > new_sentence.count and new_sentence != sentence:
+            if new_sentence.cells.issubset(sentence.cells) and new_sentence.count > 0 and sentence.count > new_sentence.count:
                 subset = sentence.cells.difference(new_sentence.cells)
                 new_subset_sentence = Sentence(
                     subset, sentence.count - new_sentence.count)
+                print(
+                    f'New inferred knowledge, {subset} has mine {sentence.count - new_sentence.count}.')
                 self.knowledge.append(new_subset_sentence)
 
     def make_safe_move(self):
@@ -245,11 +247,11 @@ class MinesweeperAI():
         This function may use the knowledge in self.mines, self.safes
         and self.moves_made, but should not modify any of those values.
         """
-        for i in range(self.height):
-            for j in range(self.width):
-                if (i, j) not in self.mines and (i, j) not in self.moves_made and (i, j) not in self.safes:
-                    print(f'Move to ({i}, {j})')
-                    return (i, j)
+        print(f'mines {self.mines}')
+        print(f'Saves {self.safes}')
+        for cell in self.safes:
+            if cell not in self.moves_made:
+                return cell
         return None
 
     def make_random_move(self):
@@ -259,9 +261,12 @@ class MinesweeperAI():
             1) have not already been chosen, and
             2) are not known to be mines
         """
+        available_moves = []
         for i in range(self.height):
             for j in range(self.width):
                 if (i, j) not in self.moves_made and (i, j) not in self.mines:
-                    return (i, j)
-
-        return None
+                    available_moves.append((i, j))
+        if len(available_moves) != 0:
+            return random.choice(available_moves)
+        else:
+            return None
